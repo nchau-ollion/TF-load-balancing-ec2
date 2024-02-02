@@ -4,17 +4,21 @@ packages:
   - httpd
 
 write_files:
-  - path: /var/www/html/index.html
+  - path: /tmp/index.html
     content: |
       <html>
         <head>
           <style>body {background-color: purple;}</style>
         </head>
         <body>
-          <h1>Hello World! from Nicole's Terraform deployed by host: $(hostname -f)</h1>
+          <h1>Hello World! from Nicole's Terraform deployed by host: HOSTNAME_PLACEHOLDER</h1>
         </body>
       </html>
 
 runcmd:
+  - hostname=$(hostname -f)
+  - sed -i "s/HOSTNAME_PLACEHOLDER/$hostname/" /tmp/index.html
+  - mv /tmp/index.html /var/www/html/index.html
+  - chmod 644 /var/www/html/index.html
   - systemctl start httpd
   - systemctl enable httpd

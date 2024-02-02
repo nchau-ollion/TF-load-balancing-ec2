@@ -3,6 +3,7 @@ variable  "aws_region" {
     default = "us-west-1"
 }
 variable "vpc_azs" {
+  description = "The AZs for all the resources"
   type    = list(string)
   default = [ "us-west-1a", "us-west-1c" ]
 }
@@ -18,7 +19,7 @@ variable "public_subnets" {
 }
 
 variable "resource_tags" {
-  description   = "Tags to set for all resources"
+  description   = "The tags for all the resources"
   type          = map(string)
   default = {
     Name        = "nchau"
@@ -28,9 +29,9 @@ variable "resource_tags" {
 }
 /*
 variable "instance_count" {
-  type        = string
+  type        = number
   description = "The number of instances to create"
-  default     = "1"
+  default     = 2
 }
 */
 variable "instance_type" {

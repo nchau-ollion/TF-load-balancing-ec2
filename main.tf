@@ -66,17 +66,17 @@ resource "aws_lb" "app_lb" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name = "web-target-group"
-  port = 80
-  protocol = "HTTP"
-  vpc_id = module.vpc.vpc_id
+  name      = "web-target-group"
+  port      = 80
+  protocol  = "HTTP"
+  vpc_id    = module.vpc.vpc_id
   health_check {
-    path = "/"
-    healthy_threshold = 2
+    path      = "/"
+    healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout = 5
-    interval = 10
-    matcher = "200-299"
+    timeout   = 5
+    interval  = 10
+    matcher   = "200-299"
   }
 }
 
@@ -85,26 +85,32 @@ resource "aws_lb_listener" "lb_listener" {
   port              = "80"
   protocol          = "HTTP"
   default_action {
-    type             = "forward"
+    type            = "forward"
     target_group_arn = aws_lb_target_group.target_group.arn
   }
 }
 
-#register instance to target group
 resource "aws_lb_target_group_attachment" "web_server_attach" {
+  count            = length(var.private_subnets)
   target_group_arn = aws_lb_target_group.target_group.arn
-  target_id        = aws_instance.web_server.id
+  target_id        = aws_instance.web_server[count.index].id
   port             = 80
 }
 
 resource "aws_instance" "web_server" {
   ami           = data.aws_ami.latest_linux_ami.id
-  #count         = var.instance_count
+  count         = length(var.private_subnets)
   instance_type = var.instance_type
   user_data     = templatefile("${path.module}/cloud-config.yml", {})
   depends_on    = [aws_security_group.for_lb]
-  subnet_id     = module.vpc.private_subnets[0]  #eventually for each
-  vpc_security_group_ids = [aws_security_group.for_lb.id]
-  associate_public_ip_address = true
-  tags          = var.resource_tags
+  # get single subnet from list & ensure instance on each private subnet
+  subnet_id     = element(module.vpc.private_subnets, count.index)
+  vpc_security_group_ids      = [aws_security_group.for_lb.id]
+  associate_public_ip_address = false
+  tags          = merge(
+    var.resource_tags,
+    {
+      Name = "web-server-${count.index}"
+    }
+  )
 }
