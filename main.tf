@@ -67,7 +67,7 @@ resource "aws_lb" "app_lb" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  
+  name = "target-group"
 }
 
 resource "aws_instance" "web_server" {
