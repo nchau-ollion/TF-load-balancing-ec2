@@ -1,0 +1,20 @@
+#cloud-config
+package_update: true
+packages:
+  - httpd
+
+write_files:
+  - path: /var/www/html/index.html
+    content: |
+      <html>
+        <head>
+          <style>body {background-color: purple;}</style>
+        </head>
+        <body>
+          <h1>Hello World! from Nicole's Terraform deployed by host: $(hostname -f)</h1>
+        </body>
+      </html>
+
+runcmd:
+  - systemctl start httpd
+  - systemctl enable httpd
