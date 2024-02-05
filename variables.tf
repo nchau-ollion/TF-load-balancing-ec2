@@ -30,21 +30,9 @@ variable "resource_tags" {
     # autopark    = "M-F 9-5"   future development
   }
 }
-/*
-variable "instance_count" {
-  type        = number
-  description = "The number of instances to create"
-  default     = 2
-}
-*/
+
 variable "instance_type" {
   type        = string
   description = "The instance size type"
   default     = "t2.micro"
 }
-/*
-variable "server_port" {
-  type        = string
-  description = "The port the server will use for HTTP requests in user data script"
-  default     = "80"
-}*/
