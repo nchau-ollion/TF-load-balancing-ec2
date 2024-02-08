@@ -63,6 +63,7 @@ resource "aws_lb" "app_lb" {
   load_balancer_type  = "application"
   security_groups     = [aws_security_group.for_lb.id]
   subnets             = module.vpc.public_subnets
+  tags                = var.resource_tags
 }
 
 resource "aws_lb_target_group" "target_group" {
@@ -78,6 +79,12 @@ resource "aws_lb_target_group" "target_group" {
     interval  = 10
     matcher   = "200-299"
   }
+  tags = merge(
+    var.resource_tags,
+    {
+      Name = "web-target-group" 
+    }
+  )
 }
 
 resource "aws_lb_listener" "lb_listener" {
@@ -89,7 +96,7 @@ resource "aws_lb_listener" "lb_listener" {
     target_group_arn = aws_lb_target_group.target_group.arn
   }
 }
-
+/*  For individual servers (not needed for ASG):
 resource "aws_lb_target_group_attachment" "web_server_attach" {
   count            = length(var.private_subnets)
   target_group_arn = aws_lb_target_group.target_group.arn
@@ -110,7 +117,40 @@ resource "aws_instance" "web_server" {
   tags          = merge(
     var.resource_tags,
     {
-      Name = "web-server-${count.index}"
+      Name = "web-server-${count.index + 1}" 
     }
   )
+}
+*/
+resource "aws_launch_template" "web_server_lt" {
+  name_prefix     = "web-server-lt-"
+  image_id        = data.aws_ami.latest_linux_ami.id
+  instance_type   = var.instance_type
+  vpc_security_group_ids = [aws_security_group.for_lb.id]
+  user_data       = base64encode(templatefile("${path.module}/cloud-config.yml", {}))
+  tags            = merge(
+    var.resource_tags,
+    {
+      Name = "web-server-lt-"
+    }
+  )
+}
+
+resource "aws_autoscaling_group" "web_server_asg" {
+  launch_template {
+    id = aws_launch_template.web_server_lt.id
+    version = "$Latest"
+  }
+  vpc_zone_identifier = module.vpc.private_subnets
+  desired_capacity    = length(var.private_subnets)
+  min_size            = 2
+  max_size            = 4
+
+  target_group_arns = [aws_lb_target_group.target_group.arn]
+
+  tag {
+      key                 = "Name"
+      value               = "web-server-asg"
+      propagate_at_launch = true
+    }
 }

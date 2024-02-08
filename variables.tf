@@ -27,7 +27,7 @@ variable "resource_tags" {
   default = {
     Name        = "nchau"
     Project     = "Terraform", 
-    # autopark    = "M-F 9-5"   future development
+    # Autopark    = "M-F 9-5"   # future development
   }
 }
 
