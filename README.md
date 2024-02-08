@@ -12,7 +12,7 @@ Run terraform plan to see the changes that Terraform will make to your AWS infra
 Run terraform apply to apply the configuration and create the infrastructure. Confirm the action when prompted.
 
 #### Readme
-This readme was written with terraform docs markdown ([here](https://github.com/terraform-docs/terraform-docs)) and can be automatically updated for Windows with update-readme.ps1 ([here]()) and for Mac with update-readme.sh ([here](https://github.com/2ndWatch/TF-AWS-IAM-Cross-Account-Role/blob/main/update-readme.sh)).
+This readme was written with terraform docs markdown ([here](https://github.com/terraform-docs/terraform-docs)) and can be automatically updated for Windows with update-readme.ps1 ([here](https://github.com/nchau-ollion/TF-load-balancing-ec2/blob/feature/auto-scaling/update-readme.ps1)) and for Mac with update-readme.sh ([here](https://github.com/2ndWatch/TF-AWS-IAM-Cross-Account-Role/blob/main/update-readme.sh)).
 
 
 <!-- BEGIN_TF_DOCS -->
